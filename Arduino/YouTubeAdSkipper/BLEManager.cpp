@@ -31,7 +31,8 @@ BLEManager::BLEManager(MacroManager& macroManager)
   : _macroManager(macroManager),
     _server(nullptr),
     _connected(false),
-    _needsAdvertisingRestart(false) {}
+    _needsAdvertisingRestart(false),
+    _lastCommandMs(0) {}
 
 void BLEManager::begin() {
   s_instance = this;
@@ -58,11 +59,18 @@ void BLEManager::begin() {
 }
 
 void BLEManager::update() {
-  // After a client disconnects the server must explicitly restart advertising.
   if (_needsAdvertisingRestart) {
     _needsAdvertisingRestart = false;
     startAdvertising();
     Serial.println("[BLEManager] Re-advertising after disconnect.");
+  }
+
+  // Disconnect inactive client so a new device can take over.
+  if (_connected && Config::INACTIVITY_TIMEOUT_MS > 0) {
+    if (millis() - _lastCommandMs > Config::INACTIVITY_TIMEOUT_MS) {
+      Serial.println("[BLEManager] Inactivity timeout — disconnecting client.");
+      _server->disconnect(_server->getConnId());
+    }
   }
 }
 
@@ -74,6 +82,7 @@ bool BLEManager::isConnected() const {
 
 void BLEManager::onClientConnect() {
   _connected = true;
+  _lastCommandMs = millis();  // start the inactivity clock
   Serial.println("[BLEManager] Client connected.");
 }
 
@@ -95,6 +104,7 @@ void BLEManager::onCommandWritten(BLECharacteristic* characteristic) {
     return;
   }
 
+  _lastCommandMs = millis();  // reset inactivity timer
   Serial.printf("[BLEManager] Received %d bytes: ", value.length());
   for (int i = 0; i < value.length(); i++) {
     Serial.printf("0x%02X ", (uint8_t)value[i]);

@@ -43,6 +43,7 @@ private:
   BLEServer*    _server;
   bool          _connected;
   bool          _needsAdvertisingRestart;
+  unsigned long _lastCommandMs;  // millis() timestamp of last received command
 
   void startAdvertising();
 };

@@ -59,6 +59,11 @@ namespace Config {
   constexpr int MACRO3_LEFT = 500;
   constexpr int MACRO3_UP   = 200;
 
+  // ── Inactivity timeout ─────────────────────────────────────────────────────
+  // If no command is received within this period the current BLE client is
+  // disconnected and advertising restarts, allowing a new device to connect.
+  constexpr unsigned long INACTIVITY_TIMEOUT_MS = 10UL * 60UL * 1000UL; // 10 minutes
+
   // ── USB readiness ──────────────────────────────────────────────────────────
   // Milliseconds to wait after USB.begin() before treating HID as enumerated.
   constexpr int USB_READY_DELAY_MS = 2000;
