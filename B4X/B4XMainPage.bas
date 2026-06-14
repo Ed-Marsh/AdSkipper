@@ -1,4 +1,4 @@
-B4A=true
+﻿B4A=true
 Group=Default Group
 ModulesStructureVersion=1
 Type=Class
@@ -28,6 +28,10 @@ Sub Class_Globals
     Private Const CMD_MACRO1 As Byte = 0x01
     Private Const CMD_MACRO2 As Byte = 0x02
     Private Const CMD_MACRO3 As Byte = 0x03
+	Private lblConnectOrDisconnect As B4XView
+	Private lblSendMacro1 As B4XView
+	Private lblSendMacro2 As B4XView
+	Private lblSendMacro3 As B4XView
 End Sub
 
 Public Sub Initialize
@@ -44,19 +48,6 @@ End Sub
 
 ' ── Connect / Disconnect ──────────────────────────────────────────────────────
 
-Public Sub ConnectOrDisconnect
-    Log(TAG & " ConnectOrDisconnect called. Connected=" & Ble.IsConnected & " Scanning=" & mScanning)
-    If Ble.IsConnected Then
-        Ble.Disconnect
-    Else If mScanning Then
-        Ble.StopScan
-        mScanning = False
-        Log(TAG & " Scan cancelled by user.")
-    Else
-        Log(TAG & " Requesting BLE permissions...")
-        RequestBlePermissions
-    End If
-End Sub
 
 Private Sub RequestBlePermissions
     Log(TAG & " RequestBlePermissions called.")
@@ -87,26 +78,6 @@ Private Sub RequestBlePermissions
     Ble.StartScan
 End Sub
 
-' ── Macro buttons ─────────────────────────────────────────────────────────────
-
-Public Sub SendMacro1
-    Log(TAG & " SendMacro1 called.")
-    Ble.SendCommand(CMD_MACRO1)
-    ToastMessageShow("Macro 1 sent.", False)
-End Sub
-
-Public Sub SendMacro2
-    Log(TAG & " SendMacro2 called.")
-    Ble.SendCommand(CMD_MACRO2)
-    ToastMessageShow("Macro 2 sent.", False)
-End Sub
-
-Public Sub SendMacro3
-    Log(TAG & " SendMacro3 called.")
-    Ble.SendCommand(CMD_MACRO3)
-    ToastMessageShow("Macro 3 sent.", False)
-End Sub
-
 ' ── BLE events (raised by BleManager class) ───────────────────────────────────
 
 Private Sub Ble_DeviceFound(Name As String, DeviceID As String)
@@ -135,4 +106,37 @@ Private Sub Ble_Error(Message As String)
     Log(TAG & " Ble_Error: " & Message)
     ToastMessageShow("BLE error: " & Message, True)
     mScanning = False
+End Sub
+
+
+Private Sub lblSendMacro3_Click
+	Log(TAG & " lblSendMacro3 called.")
+	Ble.SendCommand(CMD_MACRO3)
+	ToastMessageShow("Macro 3 sent.", False)
+End Sub
+
+Private Sub lblSendMacro2_Click
+	Log(TAG & " lblSendMacro2 called.")
+	Ble.SendCommand(CMD_MACRO2)
+	ToastMessageShow("Macro 2 sent.", False)
+End Sub
+
+Private Sub lblSendMacro1_Click
+	Log(TAG & " lblSendMacro1 called.")
+	Ble.SendCommand(CMD_MACRO1)
+	ToastMessageShow("Macro 1 sent.", False)
+End Sub
+
+Private Sub lblConnectOrDisconnect_Click
+	Log(TAG & " lblConnectOrDisconnect called. Connected=" & Ble.IsConnected & " Scanning=" & mScanning)
+	If Ble.IsConnected Then
+		Ble.Disconnect
+	Else If mScanning Then
+		Ble.StopScan
+		mScanning = False
+		Log(TAG & " Scan cancelled by user.")
+	Else
+		Log(TAG & " Requesting BLE permissions...")
+		RequestBlePermissions
+	End If
 End Sub
