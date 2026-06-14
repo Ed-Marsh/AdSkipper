@@ -90,8 +90,8 @@ void BLEManager::onCommandWritten(BLECharacteristic* characteristic) {
     return;
   }
 
-  std::string value = characteristic->getValue();
-  if (value.empty()) {
+  String value = characteristic->getValue();
+  if (value.length() == 0) {
     Serial.println("[BLEManager] Empty write — ignoring.");
     return;
   }
