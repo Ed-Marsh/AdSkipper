@@ -42,6 +42,9 @@ Sub Class_Globals
     Private lblSendMacro1           As B4XView
     Private lblSendMacro2           As B4XView
     Private lblSendMacro3           As B4XView
+
+    ' ── Pages ─────────────────────────────────────────────────────────────────
+    Public MacroSetupP As MacroSetupPage
 End Sub
 
 Public Sub Initialize
@@ -53,6 +56,10 @@ Private Sub B4XPage_Created(Root1 As B4XView)
     Root = Root1
     Root.LoadLayout("MainPage")
     Ble.Initialize("Ble", Me)
+
+    MacroSetupP.Initialize
+    B4XPages.AddPage("MacroSetupPage", MacroSetupP)
+
     Log(TAG & " Ready.")
 End Sub
 
@@ -168,9 +175,8 @@ Private Sub OpenMacroSetup(MacroNum As Int)
         Return
     End If
     Log(TAG & " Opening MacroSetupPage for macro " & MacroNum)
-    Dim setupPage As MacroSetupPage
-    B4XPages.ShowPage(setupPage)
-    setupPage.Setup(MacroNum, Ble)
+    MacroSetupP.Setup(MacroNum, Ble)
+    B4XPages.ShowPage("MacroSetupPage")
 End Sub
 
 ' ── BLE events ────────────────────────────────────────────────────────────────
