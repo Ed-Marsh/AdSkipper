@@ -55,12 +55,13 @@ Private Sub RequestBlePermissions
     Dim phone As Phone
     Dim Permissions As List
     If phone.SdkVersion >= 31 Then
-        Log(TAG & " Android 12+ — requesting BLUETOOTH_SCAN, BLUETOOTH_CONNECT, ACCESS_FINE_LOCATION.")
+        ' Android 12+: BLUETOOTH_SCAN is flagged neverForLocation in the manifest
+        ' so ACCESS_FINE_LOCATION is not required for BLE scanning.
+        Log(TAG & " Android 12+ — requesting BLUETOOTH_SCAN, BLUETOOTH_CONNECT.")
         Permissions = Array("android.permission.BLUETOOTH_SCAN", _
-                            "android.permission.BLUETOOTH_CONNECT", _
-                            rp.PERMISSION_ACCESS_FINE_LOCATION)
+                            "android.permission.BLUETOOTH_CONNECT")
     Else
-        Log(TAG & " Android <12 — requesting ACCESS_FINE_LOCATION only.")
+        Log(TAG & " Android <12 — requesting ACCESS_FINE_LOCATION.")
         Permissions = Array(rp.PERMISSION_ACCESS_FINE_LOCATION)
     End If
     For Each perm As String In Permissions
@@ -72,13 +73,8 @@ Private Sub RequestBlePermissions
             Wait For B4XPage_PermissionResult (Permission As String, Result As Boolean)
             Log(TAG & " Permission result: " & Permission & " = " & Result)
             If Result = False Then
-                ' May be permanently denied — send user to App Settings to grant manually.
-                Log(TAG & " Permission denied: " & perm & " — opening App Settings.")
-                ToastMessageShow("Please grant Location in App Settings then try again.", True)
-                Dim Intent1 As Intent
-                Intent1.Initialize("android.settings.APPLICATION_DETAILS_SETTINGS", "")
-                Intent1.Data = "package:" & Application.PackageName
-                StartActivity(Intent1)
+                Log(TAG & " Permission denied: " & perm)
+                ToastMessageShow("Permission denied: " & perm, True)
                 Return
             End If
         End If
