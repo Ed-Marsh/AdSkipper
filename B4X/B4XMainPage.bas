@@ -196,11 +196,13 @@ End Sub
 
 Private Sub Ble_Connected
     Log(TAG & " Ble_Connected — ready to send commands.")
+    lblConnectOrDisconnect.Text = "BLE Connected"
     ToastMessageShow("Connected to ESP32.", False)
 End Sub
 
 Private Sub Ble_Disconnected
     Log(TAG & " Ble_Disconnected.")
+    lblConnectOrDisconnect.Text = "BLE Disconnected"
     ToastMessageShow("Disconnected.", True)
 End Sub
 
