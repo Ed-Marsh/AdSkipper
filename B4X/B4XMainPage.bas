@@ -165,6 +165,7 @@ Private Sub SendMacro(MacroNum As Int, Cmd As Byte)
     data(2) = Bit.And(offsetX, 0xFF)
     data(3) = Bit.And(Bit.ShiftRight(offsetY, 8), 0xFF)
     data(4) = Bit.And(offsetY, 0xFF)
+    Log(TAG & " Packet bytes: " & data(0) & "," & data(1) & "," & data(2) & "," & data(3) & "," & data(4))
     Ble.SendBytes(data)
     ToastMessageShow("Macro " & MacroNum & " sent.", False)
 End Sub
