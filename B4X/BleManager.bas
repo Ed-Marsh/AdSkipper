@@ -98,14 +98,16 @@ Private Sub Ble_Inner_DeviceFound(Name As String, ID As String, AdvertisingData 
     CallSub3(mPage, mEventName & "_DeviceFound", Name, ID)
 End Sub
 
-Private Sub Ble_Inner_Connected(Services As Map)
+Private Sub Ble_Inner_Connected(Services As List)
     Log(TAG & " Connected callback fired. Services found: " & Services.Size)
-    Dim keys As List
-    keys = Services.Keys
-    For Each k As String In keys
-        Log(TAG & "   Service UUID: " & k)
+    Dim found As Boolean = False
+    For Each svc As String In Services
+        Log(TAG & "   Service UUID: " & svc)
+        If svc.ToLowerCase = SERVICE_UUID.ToLowerCase Then
+            found = True
+        End If
     Next
-    If Services.ContainsKey(SERVICE_UUID) Then
+    If found Then
         Log(TAG & " Target service found — marking as connected.")
         mConnected = True
         CallSub(mPage, mEventName & "_Connected")
