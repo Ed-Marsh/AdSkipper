@@ -110,9 +110,9 @@ End Sub
 
 Private Sub Nudge(dx As Int, dy As Int)
     Log(TAG & " Nudge dx=" & dx & " dy=" & dy)
-    ' Update tracked offsets (X = left from corner, Y = up from corner).
-    ' A nudge RIGHT means the target is less far left, so X decreases.
-    ' A nudge UP means the target is more far up, so Y increases.
+    ' The offsets represent how far LEFT and UP the target is from the corner.
+    ' Moving left (negative dx) increases the left offset.
+    ' Moving up (negative dy) increases the up offset.
     mOffsetX = mOffsetX - dx
     mOffsetY = mOffsetY - dy
     UpdateOffsetLabels
