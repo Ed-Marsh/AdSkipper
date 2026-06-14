@@ -16,11 +16,9 @@ namespace Config {
 
   // ── Mouse movement ─────────────────────────────────────────────────────────
   // Large initial moves that push the cursor into the bottom-right corner.
-  // Set to ~120% of the target monitor resolution to guarantee hitting the
-  // corner without excessive overshoot. Tune to match your screen.
-  // Current target: 3440 x 1440
-  constexpr int CORNER_MOVE_RIGHT = 4000;
-  constexpr int CORNER_MOVE_DOWN  = 2000;
+  // 5000 pixels safely overshoots any realistic monitor resolution.
+  constexpr int CORNER_MOVE_RIGHT = 5000;
+  constexpr int CORNER_MOVE_DOWN  = 5000;
 
   // Maximum signed delta per HID report packet.
   // USB HID mouse reports use int8_t, so the hardware limit is ±127.
