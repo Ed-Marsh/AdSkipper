@@ -22,19 +22,22 @@ Sub Class_Globals
     Private mEventName  As String
     Private mConnected  As Boolean
     Private mDeviceID   As String   ' ID of the connected/connecting device
+    Private mBluetoothReady As Boolean
 End Sub
 
 Public Sub Initialize(EventName As String)
     mEventName  = EventName
     mConnected  = False
     mDeviceID   = ""
+    mBluetoothReady = False
     mManager.Initialize("Ble_Inner")
+    ' StateChanged fires immediately on Initialize with the current BT state.
 End Sub
 
 ' ── Scanning ──────────────────────────────────────────────────────────────────
 
 Public Sub StartScan
-    If mManager.IsEnabled = False Then
+    If Not(mBluetoothReady) Then
         RaiseEvent_Error("Bluetooth is not enabled.")
         Return
     End If
@@ -79,8 +82,13 @@ End Sub
 
 ' ── BleManager2 inner callbacks ───────────────────────────────────────────────
 
-Private Sub Ble_Inner_DeviceFound(Name As String, ID As String, AdvertisingData As Map, RSSI As Double)
-    ' Relay every discovered device back to the page — it will filter by name.
+Private Sub Ble_Inner_StateChanged(State As Int)
+    ' STATE_POWERED_ON = 12 in BleManager2
+    mBluetoothReady = (State = mManager.STATE_POWERED_ON)
+    Log("BleManager: BT state changed: " & State & " Ready=" & mBluetoothReady)
+End Sub
+
+Private Sub Ble_Inner_DeviceFound(Name As String, ID As String, AdvertisingData As Map, RSSI As Double)    ' Relay every discovered device back to the page — it will filter by name.
     CallSubDelayed3(B4XPages.GetManager, mEventName & "_DeviceFound", Name, ID)
 End Sub
 
