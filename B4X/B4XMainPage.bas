@@ -15,7 +15,7 @@ Sub Class_Globals
     Private Root    As B4XView
     Private xui     As XUI
 
-    ' ── UI views (matched to layout) ─────────────────────────────────────────
+    ' ── UI views (must match layout names) ───────────────────────────────────
     Private lblStatus   As B4XView
     Private btnConnect  As B4XView
     Private btnMacro1   As B4XView
@@ -23,12 +23,10 @@ Sub Class_Globals
     Private btnMacro3   As B4XView
 
     ' ── BLE ──────────────────────────────────────────────────────────────────
-    Private Ble         As BleManager   ' our wrapper class
+    Private Ble         As BleManager   ' our BleManager wrapper class
     Private mScanning   As Boolean
-    Private mFoundDevice As BleDevice
-    Private mHaveDevice As Boolean
 
-    ' ── ESP32 device name to match during scan ────────────────────────────────
+    ' ── Device name to match during scan (must match Config.h BLE_DEVICE_NAME)
     Private Const ESP32_NAME As String = "ESP32-HID-Controller"
 
     ' ── Command bytes (must match MacroManager.cpp case values) ───────────────
@@ -38,14 +36,12 @@ Sub Class_Globals
 End Sub
 
 Public Sub Initialize
-    ' B4XPages calls this once before the page is created.
 End Sub
 
 Private Sub B4XPage_Created(Root1 As B4XView)
     Root = Root1
     Root.LoadLayout("MainPage")
 
-    ' Initialise BLE manager — events come back with prefix "Ble"
     Ble.Initialize("Ble")
 
     SetStatus("Ready — tap Connect to find ESP32.")
@@ -56,24 +52,47 @@ End Sub
 
 Private Sub btnConnect_Click
     If Ble.IsConnected Then
-        ' Already connected — disconnect.
         Ble.Disconnect
-        btnConnect.SetText("Connect")
         SetStatus("Disconnecting...")
     Else If mScanning Then
-        ' Cancel scan.
         Ble.StopScan
         mScanning = False
         btnConnect.SetText("Connect")
         SetStatus("Scan cancelled.")
     Else
-        ' Start scan.
-        mHaveDevice = False
-        mScanning = True
-        btnConnect.SetText("Cancel")
-        SetStatus("Scanning for " & ESP32_NAME & "...")
-        Ble.StartScan
+        ' Request BLE permissions before scanning (required Android 12+).
+        RequestBlePermissions
     End If
+End Sub
+
+Private Sub RequestBlePermissions
+    Dim rp As RuntimePermissions
+    Dim phone As Phone
+    Dim Permissions As List
+    If phone.SdkVersion >= 31 Then
+        Permissions = Array("android.permission.BLUETOOTH_SCAN", _
+                            "android.permission.BLUETOOTH_CONNECT", _
+                            rp.PERMISSION_ACCESS_FINE_LOCATION)
+    Else
+        Permissions = Array(rp.PERMISSION_ACCESS_FINE_LOCATION)
+    End If
+    For Each perm As String In Permissions
+        rp.CheckAndRequest(perm)
+        Wait For B4XPage_PermissionResult (Permission As String, Result As Boolean)
+        If Result = False Then
+            xui.ToastMessageShow("Permission denied: " & Permission, True)
+            Return
+        End If
+    Next
+    ' All permissions granted — start scan.
+    StartScan
+End Sub
+
+Private Sub StartScan
+    mScanning = True
+    btnConnect.SetText("Cancel")
+    SetStatus("Scanning for " & ESP32_NAME & "...")
+    Ble.StartScan
 End Sub
 
 ' ── Macro buttons ─────────────────────────────────────────────────────────────
@@ -99,22 +118,20 @@ Private Sub SendMacro(Command As Byte, Label As String)
     xui.ToastMessageShow(Label & " sent.", False)
 End Sub
 
-' ── BLE events ───────────────────────────────────────────────────────────────
+' ── BLE events (raised by BleManager class) ───────────────────────────────────
 
-' Called for each device found during scan.
-Private Sub Ble_DeviceFound(Name As String, Device As BleDevice)
+' Fires for every device found during scan — filter by name here.
+Private Sub Ble_DeviceFound(Name As String, DeviceID As String)
+    Log("Found device: " & Name)
     If Name = ESP32_NAME Then
-        ' Found our device — stop scanning and connect.
         Ble.StopScan
         mScanning = False
-        mFoundDevice = Device
-        mHaveDevice = True
+        btnConnect.SetText("Cancel")
         SetStatus("Found " & ESP32_NAME & " — connecting...")
-        Ble.Connect(Device)
+        Ble.Connect(DeviceID)
     End If
 End Sub
 
-' Called once GATT services are discovered and the device is ready.
 Private Sub Ble_Connected
     btnConnect.SetText("Disconnect")
     SetStatus("Connected to " & ESP32_NAME)
@@ -126,7 +143,7 @@ Private Sub Ble_Disconnected
     btnConnect.SetText("Connect")
     SetStatus("Disconnected.")
     SetMacroButtonsEnabled(False)
-    xui.ToastMessageShow("Disconnected from ESP32.", True)
+    xui.ToastMessageShow("Disconnected.", True)
 End Sub
 
 Private Sub Ble_Error(Message As String)
