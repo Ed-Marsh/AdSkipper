@@ -56,8 +56,6 @@ Sub Class_Globals
     Private mOffsetX    As Int      ' pixels LEFT from bottom-right corner
     Private mOffsetY    As Int      ' pixels UP from bottom-right corner
     Private mBle        As BleManager  ' shared BLE instance passed from MainPage
-	Private Activity As Activity
-	Private Label1 As B4XView
 End Sub
 
 Public Sub Initialize
