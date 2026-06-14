@@ -33,7 +33,7 @@ Public Sub Initialize(EventName As String, Page As Object)
     mConnected      = False
     mBluetoothReady = False
     mPage           = Page
-    mManager.Initialize("Ble_Inner")
+    mManager.Initialize("BM")
     Log(TAG & " BleManager2 initialized.")
 End Sub
 
@@ -88,17 +88,17 @@ End Sub
 
 ' ── BleManager2 inner callbacks ───────────────────────────────────────────────
 
-Private Sub Ble_Inner_StateChanged(State As Int)
+Private Sub BM_StateChanged(State As Int)
     mBluetoothReady = (State = mManager.STATE_POWERED_ON)
     Log(TAG & " StateChanged: State=" & State & " BluetoothReady=" & mBluetoothReady)
 End Sub
 
-Private Sub Ble_Inner_DeviceFound(Name As String, ID As String, AdvertisingData As Map, RSSI As Double)
+Private Sub BM_DeviceFound(Name As String, ID As String, AdvertisingData As Map, RSSI As Double)
     Log(TAG & " DeviceFound: Name='" & Name & "' ID=" & ID & " RSSI=" & RSSI)
     CallSub3(mPage, mEventName & "_DeviceFound", Name, ID)
 End Sub
 
-Private Sub Ble_Inner_Connected(Services As List)
+Private Sub BM_Connected(Services As List)
     Log(TAG & " Connected callback fired. Services found: " & Services.Size)
     Dim found As Boolean = False
     For Each svc As String In Services
@@ -118,17 +118,17 @@ Private Sub Ble_Inner_Connected(Services As List)
     End If
 End Sub
 
-Private Sub Ble_Inner_Disconnected
+Private Sub BM_Disconnected
     Log(TAG & " Disconnected callback fired.")
     mConnected = False
     CallSub(mPage, mEventName & "_Disconnected")
 End Sub
 
-Private Sub Ble_Inner_DataAvailable(ServiceID As String, CharacteristicID As String, Data() As Byte)
+Private Sub BM_DataAvailable(ServiceID As String, CharacteristicID As String, Data() As Byte)
     Log(TAG & " DataAvailable (unexpected): ServiceID=" & ServiceID & " CharID=" & CharacteristicID)
 End Sub
 
-Private Sub Ble_Inner_WriteComplete(ServiceID As String, CharacteristicID As String, Status As Int)
+Private Sub BM_WriteComplete(ServiceID As String, CharacteristicID As String, Status As Int)
     Log(TAG & " WriteComplete: ServiceID=" & ServiceID & " CharID=" & CharacteristicID & " Status=" & Status)
     If Status <> 0 Then
         RaiseEvent_Error("Write failed, status: " & Status)
