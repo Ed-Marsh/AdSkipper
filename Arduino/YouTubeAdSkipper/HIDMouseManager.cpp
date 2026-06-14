@@ -8,9 +8,10 @@ void HIDMouseManager::begin() {
   Serial.println("[HIDMouse] begin() called.");
   _mouse.begin();
   // USB.begin() is called once in main setup(); the mouse just registers itself.
-  // Wait for Windows to finish HID enumeration before any movement.
-  Serial.printf("[HIDMouse] Waiting %d ms for USB enumeration...\n", Config::USB_READY_DELAY_MS);
-  delay(Config::USB_READY_DELAY_MS);
+  // Use vTaskDelay instead of delay() so the FreeRTOS scheduler keeps running
+  // and the watchdog timer gets fed during USB enumeration.
+  Serial.printf("[HIDMouse] Waiting %d ms for USB enumeration (yielding)...\n", Config::USB_READY_DELAY_MS);
+  vTaskDelay(pdMS_TO_TICKS(Config::USB_READY_DELAY_MS));
   _ready = true;
   Serial.println("[HIDMouse] Ready.");
 }

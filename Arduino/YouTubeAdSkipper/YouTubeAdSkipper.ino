@@ -33,17 +33,23 @@ BLEManager      bleManager(macroManager);
 
 void setup() {
   Serial.begin(115200);
+  // Give Serial time to connect before logging anything.
+  vTaskDelay(pdMS_TO_TICKS(500));
+  Serial.println("[Main] Serial ready.");
 
   // USB.begin() must be called before any HID begin().
+  Serial.println("[Main] Starting USB...");
   USB.begin();
 
-  // Initialise HID mouse — internally waits for USB enumeration.
+  // Initialise HID mouse — waits for USB enumeration via vTaskDelay (WDT-safe).
+  Serial.println("[Main] Starting HID mouse...");
   hidMouse.begin();
 
   // Initialise BLE server and start advertising.
+  Serial.println("[Main] Starting BLE...");
   bleManager.begin();
 
-  Serial.println("[Main] Setup complete.  Waiting for BLE commands.");
+  Serial.println("[Main] Setup complete. Waiting for BLE commands.");
 }
 
 void loop() {
