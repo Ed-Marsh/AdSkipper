@@ -128,12 +128,7 @@ Private Sub BM_DataAvailable(ServiceID As String, CharacteristicID As String, Da
     Log(TAG & " DataAvailable (unexpected): ServiceID=" & ServiceID & " CharID=" & CharacteristicID)
 End Sub
 
-Private Sub BM_WriteComplete(ServiceID As String, CharacteristicID As String, Status As Int)
-    Log(TAG & " WriteComplete: ServiceID=" & ServiceID & " CharID=" & CharacteristicID & " Status=" & Status)
-    If Status <> 0 Then
-        RaiseEvent_Error("Write failed, status: " & Status)
-    End If
-End Sub
+' WriteComplete is intentionally not implemented — B4A BLE2 will silently ignore missing optional callbacks.
 
 ' ── Helpers ───────────────────────────────────────────────────────────────────
 
