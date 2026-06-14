@@ -96,8 +96,8 @@ Built with **B4A** using **B4XPages**.
 
 ### Usage
 
-1. Tap **Connect** — the app scans for `ESP32-HID-Controller` and connects automatically.
-2. Tap a **macro button** to trigger that macro.
+1. Tap **Connect** — the app scans for `ESP32-HID-Controller` and connects automatically. The button text updates to show connection state.
+2. Tap a **macro button** to trigger that macro. Haptic feedback confirms the tap.
 3. **Long press** a macro button to open the setup page and calibrate the target position.
 
 ### Calibrating a macro
@@ -108,6 +108,10 @@ Built with **B4A** using **B4XPages**.
 4. Tap **Save** — the offset is stored on the phone and used for all future macro triggers.
 
 > **Important:** Disable **"Enhance pointer precision"** in Windows mouse settings. Mouse acceleration causes HID pixel values to be non-linear, making calibration unreliable.
+
+### Connection takeover
+
+Only one device can be connected at a time. If no command is sent for **10 minutes**, the ESP32 automatically disconnects the current client and restarts advertising — allowing a second device to connect without needing to touch the first phone.
 
 ---
 
@@ -122,3 +126,4 @@ Built with **B4A** using **B4XPages**.
 | `CORNER_SETTLE_MS` | 300 | Settle time after corner move (ms) |
 | `PRE_CLICK_DELAY_MS` | 30 | Delay before click (ms) |
 | `USB_READY_DELAY_MS` | 2000 | USB enumeration wait on boot (ms) |
+| `INACTIVITY_TIMEOUT_MS` | 600000 | Inactivity timeout before auto-disconnect (ms) |
