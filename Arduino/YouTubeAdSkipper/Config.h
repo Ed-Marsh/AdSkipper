@@ -30,7 +30,8 @@ namespace Config {
   constexpr int STEP_DELAY_MS = 5;
 
   // Milliseconds to wait after reaching the corner before the offset move.
-  constexpr int CORNER_SETTLE_MS = 50;
+  // Needs to be long enough for Windows to process all buffered HID packets.
+  constexpr int CORNER_SETTLE_MS = 300;
 
   // Milliseconds to wait after the offset move before clicking.
   constexpr int PRE_CLICK_DELAY_MS = 30;
