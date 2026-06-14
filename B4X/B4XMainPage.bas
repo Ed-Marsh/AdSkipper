@@ -1,4 +1,4 @@
-﻿B4A=true
+B4A=true
 Group=Default Group
 ModulesStructureVersion=1
 Type=Class
@@ -12,6 +12,8 @@ Version=9.85
 #Macro: Title, Export B4XPages, ide://run?File=%B4X%\Zipper.jar&Args=%PROJECT_NAME%.zip
 
 Sub Class_Globals
+    Private Const TAG As String = "[MainPage]"
+
     Private Root    As B4XView
     Private xui     As XUI
 
@@ -29,65 +31,78 @@ Sub Class_Globals
 End Sub
 
 Public Sub Initialize
+    Log(TAG & " Initialize called.")
 End Sub
 
 Private Sub B4XPage_Created(Root1 As B4XView)
+    Log(TAG & " B4XPage_Created called.")
     Root = Root1
     Root.LoadLayout("MainPage")
     Ble.Initialize("Ble")
+    Log(TAG & " Ready.")
 End Sub
 
 ' ── Connect / Disconnect ──────────────────────────────────────────────────────
-' Wire your Connect button Click event to this sub.
 
 Public Sub ConnectOrDisconnect
+    Log(TAG & " ConnectOrDisconnect called. Connected=" & Ble.IsConnected & " Scanning=" & mScanning)
     If Ble.IsConnected Then
         Ble.Disconnect
     Else If mScanning Then
         Ble.StopScan
         mScanning = False
+        Log(TAG & " Scan cancelled by user.")
     Else
+        Log(TAG & " Requesting BLE permissions...")
         RequestBlePermissions
     End If
 End Sub
 
 Private Sub RequestBlePermissions
+    Log(TAG & " RequestBlePermissions called.")
     Dim rp As RuntimePermissions
     Dim phone As Phone
     Dim Permissions As List
     If phone.SdkVersion >= 31 Then
+        Log(TAG & " Android 12+ — requesting BLUETOOTH_SCAN, BLUETOOTH_CONNECT, ACCESS_FINE_LOCATION.")
         Permissions = Array("android.permission.BLUETOOTH_SCAN", _
                             "android.permission.BLUETOOTH_CONNECT", _
                             rp.PERMISSION_ACCESS_FINE_LOCATION)
     Else
+        Log(TAG & " Android <12 — requesting ACCESS_FINE_LOCATION only.")
         Permissions = Array(rp.PERMISSION_ACCESS_FINE_LOCATION)
     End If
     For Each perm As String In Permissions
+        Log(TAG & " Requesting permission: " & perm)
         rp.CheckAndRequest(perm)
         Wait For B4XPage_PermissionResult (Permission As String, Result As Boolean)
+        Log(TAG & " Permission result: " & Permission & " = " & Result)
         If Result = False Then
             ToastMessageShow("Permission denied: " & Permission, True)
             Return
         End If
     Next
+    Log(TAG & " All permissions granted — starting scan.")
     mScanning = True
     Ble.StartScan
 End Sub
 
 ' ── Macro buttons ─────────────────────────────────────────────────────────────
-' Wire each button Click event to the appropriate sub below.
 
 Public Sub SendMacro1
+    Log(TAG & " SendMacro1 called.")
     Ble.SendCommand(CMD_MACRO1)
     ToastMessageShow("Macro 1 sent.", False)
 End Sub
 
 Public Sub SendMacro2
+    Log(TAG & " SendMacro2 called.")
     Ble.SendCommand(CMD_MACRO2)
     ToastMessageShow("Macro 2 sent.", False)
 End Sub
 
 Public Sub SendMacro3
+    Log(TAG & " SendMacro3 called.")
     Ble.SendCommand(CMD_MACRO3)
     ToastMessageShow("Macro 3 sent.", False)
 End Sub
@@ -95,27 +110,29 @@ End Sub
 ' ── BLE events (raised by BleManager class) ───────────────────────────────────
 
 Private Sub Ble_DeviceFound(Name As String, DeviceID As String)
-    Log("Found device: " & Name)
+    Log(TAG & " Ble_DeviceFound: Name='" & Name & "' ID=" & DeviceID)
     If Name = ESP32_NAME Then
+        Log(TAG & " Target device found! Stopping scan and connecting...")
         Ble.StopScan
         mScanning = False
-        Log("Connecting to " & ESP32_NAME)
         Ble.Connect(DeviceID)
+    Else
+        Log(TAG & " Ignoring device: " & Name)
     End If
 End Sub
 
 Private Sub Ble_Connected
-    Log("Connected to " & ESP32_NAME)
+    Log(TAG & " Ble_Connected — ready to send commands.")
     ToastMessageShow("Connected to ESP32.", False)
 End Sub
 
 Private Sub Ble_Disconnected
-    Log("Disconnected.")
+    Log(TAG & " Ble_Disconnected.")
     ToastMessageShow("Disconnected.", True)
 End Sub
 
 Private Sub Ble_Error(Message As String)
-    Log("BLE error: " & Message)
+    Log(TAG & " Ble_Error: " & Message)
     ToastMessageShow("BLE error: " & Message, True)
     mScanning = False
 End Sub

@@ -5,11 +5,14 @@ HIDMouseManager::HIDMouseManager()
   : _ready(false) {}
 
 void HIDMouseManager::begin() {
+  Serial.println("[HIDMouse] begin() called.");
   _mouse.begin();
   // USB.begin() is called once in main setup(); the mouse just registers itself.
-  // We wait a fixed period so Windows finishes HID enumeration before we move.
+  // Wait for Windows to finish HID enumeration before any movement.
+  Serial.printf("[HIDMouse] Waiting %d ms for USB enumeration...\n", Config::USB_READY_DELAY_MS);
   delay(Config::USB_READY_DELAY_MS);
   _ready = true;
+  Serial.println("[HIDMouse] Ready.");
 }
 
 bool HIDMouseManager::isReady() const {
@@ -17,10 +20,14 @@ bool HIDMouseManager::isReady() const {
 }
 
 void HIDMouseManager::moveLarge(int totalDx, int totalDy) {
-  if (!_ready) return;
+  if (!_ready) {
+    Serial.println("[HIDMouse] moveLarge called but not ready — ignoring.");
+    return;
+  }
 
-  // Walk both axes in lock-step so the cursor travels roughly diagonally.
-  // Each iteration sends one HID report covering up to HID_STEP_SIZE in each axis.
+  Serial.printf("[HIDMouse] moveLarge start: dx=%d dy=%d\n", totalDx, totalDy);
+  int steps = 0;
+
   while (totalDx != 0 || totalDy != 0) {
     int stepX = 0;
     int stepY = 0;
@@ -43,11 +50,24 @@ void HIDMouseManager::moveLarge(int totalDx, int totalDy) {
 
     // move() accepts int8_t; the clamping above keeps values in ±127.
     _mouse.move(static_cast<int8_t>(stepX), static_cast<int8_t>(stepY), 0);
+    steps++;
+
+    // Feed the watchdog every 10 steps to prevent WDT resets during long moves.
+    if (steps % 10 == 0) {
+      vTaskDelay(1);
+    }
+
     delay(Config::STEP_DELAY_MS);
   }
+
+  Serial.printf("[HIDMouse] moveLarge complete: %d steps taken.\n", steps);
 }
 
 void HIDMouseManager::leftClick() {
-  if (!_ready) return;
+  if (!_ready) {
+    Serial.println("[HIDMouse] leftClick called but not ready — ignoring.");
+    return;
+  }
+  Serial.println("[HIDMouse] leftClick.");
   _mouse.click(MOUSE_LEFT);
 }
