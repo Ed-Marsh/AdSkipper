@@ -169,7 +169,7 @@ Private Sub OpenMacroSetup(MacroNum As Int)
     End If
     Log(TAG & " Opening MacroSetupPage for macro " & MacroNum)
     Dim setupPage As MacroSetupPage
-    B4XPages.ShowPage("MacroSetupPage", setupPage)
+    B4XPages.ShowPage(setupPage)
     setupPage.Setup(MacroNum, Ble)
 End Sub
 
