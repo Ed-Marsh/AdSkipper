@@ -1,4 +1,4 @@
-B4A=true
+﻿B4A=true
 Group=Default Group
 ModulesStructureVersion=1
 Type=Class
@@ -56,6 +56,8 @@ Sub Class_Globals
     Private mOffsetX    As Int      ' pixels LEFT from bottom-right corner
     Private mOffsetY    As Int      ' pixels UP from bottom-right corner
     Private mBle        As BleManager  ' shared BLE instance passed from MainPage
+	Private Activity As Activity
+	Private Label1 As B4XView
 End Sub
 
 Public Sub Initialize
@@ -76,13 +78,13 @@ Public Sub Setup(MacroNum As Int, Ble As BleManager)
     mBle      = Ble
 
     ' Load saved offsets, or use defaults.
-    Dim kvs As KeyValueStore2
-    kvs.Initialize("AdSkipperKVS")
+    Dim kvs As KeyValueStore
+    kvs.Initialize(xui.DefaultFolder, "AdSkipperKVS")
     mOffsetX = kvs.GetDefault(KVS_KEY_X & MacroNum, DEFAULT_OFFSET_X)
     mOffsetY = kvs.GetDefault(KVS_KEY_Y & MacroNum, DEFAULT_OFFSET_Y)
     Log(TAG & " Loaded offsets: X=" & mOffsetX & " Y=" & mOffsetY)
 
-    lblTitle.SetText("Configure Macro " & MacroNum)
+    lblTitle.Text = "Configure Macro " & MacroNum
     UpdateOffsetLabels
 
     ' Send mouse to corner so all nudges are relative to it.
@@ -122,8 +124,8 @@ End Sub
 
 Private Sub btnSave_Click
     Log(TAG & " Save: MacroNum=" & mMacroNum & " X=" & mOffsetX & " Y=" & mOffsetY)
-    Dim kvs As KeyValueStore2
-    kvs.Initialize("AdSkipperKVS")
+    Dim kvs As KeyValueStore
+    kvs.Initialize(xui.DefaultFolder, "AdSkipperKVS")
     kvs.Put(KVS_KEY_X & mMacroNum, mOffsetX)
     kvs.Put(KVS_KEY_Y & mMacroNum, mOffsetY)
     ToastMessageShow("Macro " & mMacroNum & " saved.", False)
@@ -160,7 +162,7 @@ End Sub
 ' ── Helpers ───────────────────────────────────────────────────────────────────
 
 Private Sub StepSize As Int
-    Dim s As String = edtStepSize.GetText
+    Dim s As String = edtStepSize.Text
     If s = "" Then Return 10
     Dim n As Int = s
     If n <= 0 Then Return 10
@@ -168,6 +170,6 @@ Private Sub StepSize As Int
 End Sub
 
 Private Sub UpdateOffsetLabels
-    lblOffsetX.SetText("X (left from corner): " & mOffsetX)
-    lblOffsetY.SetText("Y (up from corner): " & mOffsetY)
+    lblOffsetX.Text = "X (left from corner): " & mOffsetX
+    lblOffsetY.Text = "Y (up from corner): " & mOffsetY
 End Sub
