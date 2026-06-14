@@ -1,4 +1,4 @@
-B4A=true
+﻿B4A=true
 Group=Default Group
 ModulesStructureVersion=1
 Type=Class
@@ -128,8 +128,11 @@ Private Sub Ble_Inner_DataAvailable(ServiceID As String, CharacteristicID As Str
     Log(TAG & " DataAvailable (unexpected): ServiceID=" & ServiceID & " CharID=" & CharacteristicID)
 End Sub
 
-Private Sub Ble_Inner_WriteComplete(ServiceID As String, CharacteristicID As String)
-    Log(TAG & " WriteComplete: ServiceID=" & ServiceID & " CharID=" & CharacteristicID)
+Private Sub Ble_Inner_WriteComplete(ServiceID As String, CharacteristicID As String, Status As Int)
+    Log(TAG & " WriteComplete: ServiceID=" & ServiceID & " CharID=" & CharacteristicID & " Status=" & Status)
+    If Status <> 0 Then
+        RaiseEvent_Error("Write failed, status: " & Status)
+    End If
 End Sub
 
 ' ── Helpers ───────────────────────────────────────────────────────────────────
