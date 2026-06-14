@@ -68,8 +68,7 @@ Private Sub B4XPage_Created(Root1 As B4XView)
     Root.LoadLayout("MacroSetupLayout")
 End Sub
 
-' Called by MainPage after pushing this page.
-' MacroNum = 1/2/3, Ble = the connected BleManager instance.
+' Called by MainPage before ShowPage — stores params only, no UI access yet.
 Public Sub Setup(MacroNum As Int, Ble As BleManager)
     Log(TAG & " Setup: MacroNum=" & MacroNum)
     mMacroNum = MacroNum
@@ -81,11 +80,13 @@ Public Sub Setup(MacroNum As Int, Ble As BleManager)
     mOffsetX = kvs.GetDefault(KVS_KEY_X & MacroNum, DEFAULT_OFFSET_X)
     mOffsetY = kvs.GetDefault(KVS_KEY_Y & MacroNum, DEFAULT_OFFSET_Y)
     Log(TAG & " Loaded offsets: X=" & mOffsetX & " Y=" & mOffsetY)
+End Sub
 
-    lblTitle.Text = "Configure Macro " & MacroNum
+' Layout is loaded and views are ready — update UI and send mouse to corner.
+Private Sub B4XPage_Appear
+    Log(TAG & " B4XPage_Appear.")
+    lblTitle.Text = "Configure Macro " & mMacroNum
     UpdateOffsetLabels
-
-    ' Send mouse to corner so all nudges are relative to it.
     GotoCorner
 End Sub
 
