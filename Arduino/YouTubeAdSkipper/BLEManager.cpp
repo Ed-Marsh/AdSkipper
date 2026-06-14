@@ -85,7 +85,6 @@ void BLEManager::onClientDisconnect() {
 
 void BLEManager::onCommandWritten(BLECharacteristic* characteristic) {
   if (!_connected) {
-    // Should not happen, but guard defensively.
     Serial.println("[BLEManager] Write received but not connected — ignoring.");
     return;
   }
@@ -96,10 +95,16 @@ void BLEManager::onCommandWritten(BLECharacteristic* characteristic) {
     return;
   }
 
-  uint8_t command = static_cast<uint8_t>(value[0]);
-  Serial.printf("[BLEManager] Received command: 0x%02X\n", command);
+  Serial.printf("[BLEManager] Received %d bytes: ", value.length());
+  for (int i = 0; i < value.length(); i++) {
+    Serial.printf("0x%02X ", (uint8_t)value[i]);
+  }
+  Serial.println();
 
-  _macroManager.executeMacro(command);
+  _macroManager.executeCommand(
+    reinterpret_cast<const uint8_t*>(value.c_str()),
+    value.length()
+  );
 }
 
 // ── Private helpers ───────────────────────────────────────────────────────────

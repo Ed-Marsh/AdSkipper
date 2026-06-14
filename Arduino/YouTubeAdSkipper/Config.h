@@ -35,6 +35,17 @@ namespace Config {
   // Milliseconds to wait after the offset move before clicking.
   constexpr int PRE_CLICK_DELAY_MS = 30;
 
+  // ── Command bytes ──────────────────────────────────────────────────────────
+  // Sent as first byte of every BLE packet.
+  // Macro commands (0x01-0x03): 5 bytes total [cmd, x_high, x_low, y_high, y_low]
+  //   x/y are the pixel offset LEFT and UP from the bottom-right corner.
+  // Setup commands (0x10, 0x11): used by the phone's macro setup page.
+  constexpr uint8_t CMD_MACRO1        = 0x01;
+  constexpr uint8_t CMD_MACRO2        = 0x02;
+  constexpr uint8_t CMD_MACRO3        = 0x03;
+  constexpr uint8_t CMD_GOTO_CORNER   = 0x10; // Move to bottom-right, no click
+  constexpr uint8_t CMD_RELATIVE_MOVE = 0x11; // 5 bytes: [0x11, dx_high, dx_low, dy_high, dy_low]
+
   // ── Macro 1 target offset from bottom-right corner ─────────────────────────
   constexpr int MACRO1_LEFT = 160;
   constexpr int MACRO1_UP   = 70;

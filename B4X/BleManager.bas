@@ -74,16 +74,14 @@ End Sub
 
 ' ── Commands ──────────────────────────────────────────────────────────────────
 
-Public Sub SendCommand(Command As Byte)
-    Log(TAG & " SendCommand called. Command=0x" & Bit.ToHexString(Command) & " Connected=" & mConnected)
+' Send a pre-built byte array directly to the ESP32.
+Public Sub SendBytes(Data() As Byte)
     If Not(mConnected) Then
         RaiseEvent_Error("Not connected to ESP32.")
         Return
     End If
-    Dim data(1) As Byte
-    data(0) = Command
-    Log(TAG & " Writing data to characteristic...")
-    mManager.WriteData(SERVICE_UUID, COMMAND_CHAR_UUID, data)
+    Log(TAG & " SendBytes: " & Data.Length & " bytes")
+    mManager.WriteData(SERVICE_UUID, COMMAND_CHAR_UUID, Data)
 End Sub
 
 ' ── BleManager2 inner callbacks ───────────────────────────────────────────────

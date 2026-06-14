@@ -10,8 +10,8 @@ class MacroManager; // forward declaration avoids circular include
 /**
  * BLEManager
  * Owns the BLE GATT server.  Exposes one writable characteristic;
- * when the Android app writes a command byte the value is forwarded
- * to MacroManager::executeMacro().
+ * when the Android app writes a command packet it is forwarded
+ * to MacroManager::executeCommand().
  *
  * Architecture note:
  *   The ESP32 BLE library requires callback objects derived from
