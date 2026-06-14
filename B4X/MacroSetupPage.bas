@@ -85,6 +85,10 @@ End Sub
 ' Layout is loaded and views are ready — update UI and send mouse to corner.
 Private Sub B4XPage_Appear
     Log(TAG & " B4XPage_Appear.")
+    ' Mouse is being sent to corner now, so reset offsets to 0.
+    ' Nudges from here will accumulate from the corner position.
+    mOffsetX = 0
+    mOffsetY = 0
     lblTitle.Text = "Configure Macro " & mMacroNum
     UpdateOffsetLabels
     GotoCorner
