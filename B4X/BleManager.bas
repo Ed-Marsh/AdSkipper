@@ -18,17 +18,15 @@ Sub Class_Globals
     Private Const SERVICE_UUID      As String = "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
     Private Const COMMAND_CHAR_UUID As String = "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 
-    Private mManager    As BleManager2
-    Private mEventName  As String
-    Private mConnected  As Boolean
-    Private mDeviceID   As String   ' ID of the connected/connecting device
+    Private mManager        As BleManager2
+    Private mEventName      As String
+    Private mConnected      As Boolean
     Private mBluetoothReady As Boolean
 End Sub
 
 Public Sub Initialize(EventName As String)
-    mEventName  = EventName
-    mConnected  = False
-    mDeviceID   = ""
+    mEventName      = EventName
+    mConnected      = False
     mBluetoothReady = False
     mManager.Initialize("Ble_Inner")
     ' StateChanged fires immediately on Initialize with the current BT state.
@@ -53,7 +51,6 @@ End Sub
 ' ── Connection ────────────────────────────────────────────────────────────────
 
 Public Sub Connect(DeviceID As String)
-    mDeviceID = DeviceID
     mManager.Connect2(DeviceID, False)
 End Sub
 
@@ -105,7 +102,6 @@ End Sub
 
 Private Sub Ble_Inner_Disconnected
     mConnected = False
-    mDeviceID  = ""
     CallSubDelayed(B4XPages.GetManager, mEventName & "_Disconnected")
 End Sub
 
