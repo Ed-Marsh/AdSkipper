@@ -67,6 +67,8 @@ End Sub
 
 Private Sub lblConnectOrDisconnect_Click
     Log(TAG & " lblConnectOrDisconnect called. Connected=" & Ble.IsConnected & " Scanning=" & mScanning)
+    Dim haptic As PhoneVibrate
+    haptic.Vibrate(40)
     If Ble.IsConnected Then
         Ble.Disconnect
     Else If mScanning Then
@@ -147,6 +149,8 @@ End Sub
 ' ── Helpers ───────────────────────────────────────────────────────────────────
 
 Private Sub SendMacro(MacroNum As Int, Cmd As Byte)
+    Dim haptic As PhoneVibrate
+    haptic.Vibrate(40)
     If Not(Ble.IsConnected) Then
         ToastMessageShow("Not connected to ESP32.", True)
         Return
