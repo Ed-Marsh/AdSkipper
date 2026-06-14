@@ -145,8 +145,8 @@ Private Sub SendMacro(MacroNum As Int, Cmd As Byte)
         Return
     End If
     ' Load saved offsets for this macro.
-    Dim kvs As KeyValueStore2
-    kvs.Initialize("AdSkipperKVS")
+    Dim kvs As KeyValueStore
+    kvs.Initialize(xui.DefaultFolder, "AdSkipperKVS")
     Dim offsetX As Int = kvs.GetDefault(KVS_KEY_X & MacroNum, DEFAULT_OFFSET_X)
     Dim offsetY As Int = kvs.GetDefault(KVS_KEY_Y & MacroNum, DEFAULT_OFFSET_Y)
     Log(TAG & " SendMacro " & MacroNum & ": cmd=0x" & Bit.ToHexString(Cmd) & " X=" & offsetX & " Y=" & offsetY)
