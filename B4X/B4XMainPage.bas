@@ -42,7 +42,7 @@ Private Sub B4XPage_Created(Root1 As B4XView)
     Log(TAG & " B4XPage_Created called.")
     Root = Root1
     Root.LoadLayout("MainPage")
-    Ble.Initialize("Ble")
+    Ble.Initialize("Ble", Me)
     Log(TAG & " Ready.")
 End Sub
 

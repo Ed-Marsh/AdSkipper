@@ -1,4 +1,4 @@
-﻿B4A=true
+B4A=true
 Group=Default Group
 ModulesStructureVersion=1
 Type=Class
@@ -24,13 +24,15 @@ Sub Class_Globals
     Private mEventName      As String
     Private mConnected      As Boolean
     Private mBluetoothReady As Boolean
+    Private mPage           As Object  ' reference to the calling B4XPage
 End Sub
 
-Public Sub Initialize(EventName As String)
+Public Sub Initialize(EventName As String, Page As Object)
     Log(TAG & " Initialize, EventName=" & EventName)
     mEventName      = EventName
     mConnected      = False
     mBluetoothReady = False
+    mPage           = Page
     mManager.Initialize("Ble_Inner")
     Log(TAG & " BleManager2 initialized.")
 End Sub
@@ -88,12 +90,12 @@ End Sub
 
 Private Sub Ble_Inner_StateChanged(State As Int)
     mBluetoothReady = (State = mManager.STATE_POWERED_ON)
-    Log(TAG & " StateChanged: State=" & State & " STATE_POWERED_ON=" & mManager.STATE_POWERED_ON & " BluetoothReady=" & mBluetoothReady)
+    Log(TAG & " StateChanged: State=" & State & " BluetoothReady=" & mBluetoothReady)
 End Sub
 
 Private Sub Ble_Inner_DeviceFound(Name As String, ID As String, AdvertisingData As Map, RSSI As Double)
     Log(TAG & " DeviceFound: Name='" & Name & "' ID=" & ID & " RSSI=" & RSSI)
-    CallSubDelayed3(B4XPages.GetManager, mEventName & "_DeviceFound", Name, ID)
+    CallSub3(mPage, mEventName & "_DeviceFound", Name, ID)
 End Sub
 
 Private Sub Ble_Inner_Connected(Services As Map)
@@ -106,7 +108,7 @@ Private Sub Ble_Inner_Connected(Services As Map)
     If Services.ContainsKey(SERVICE_UUID) Then
         Log(TAG & " Target service found — marking as connected.")
         mConnected = True
-        CallSubDelayed(B4XPages.GetManager, mEventName & "_Connected")
+        CallSub(mPage, mEventName & "_Connected")
     Else
         Log(TAG & " ERROR: Target service NOT found after connecting.")
         RaiseEvent_Error("ESP32 AdSkipper GATT service not found.")
@@ -117,7 +119,7 @@ End Sub
 Private Sub Ble_Inner_Disconnected
     Log(TAG & " Disconnected callback fired.")
     mConnected = False
-    CallSubDelayed(B4XPages.GetManager, mEventName & "_Disconnected")
+    CallSub(mPage, mEventName & "_Disconnected")
 End Sub
 
 Private Sub Ble_Inner_DataAvailable(ServiceID As String, CharacteristicID As String, Data() As Byte)
@@ -135,5 +137,5 @@ End Sub
 
 Private Sub RaiseEvent_Error(Message As String)
     Log(TAG & " ERROR: " & Message)
-    CallSubDelayed2(B4XPages.GetManager, mEventName & "_Error", Message)
+    CallSub2(mPage, mEventName & "_Error", Message)
 End Sub
