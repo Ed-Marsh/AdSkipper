@@ -197,12 +197,14 @@ End Sub
 Private Sub Ble_Connected
     Log(TAG & " Ble_Connected — ready to send commands.")
     lblConnectOrDisconnect.Text = "BLE Connected"
+	lblConnectOrDisconnect.SetColorAndBorder (xui.Color_Green, 1dip, xui.Color_Black, 20dip)
     ToastMessageShow("Connected to ESP32.", False)
 End Sub
 
 Private Sub Ble_Disconnected
     Log(TAG & " Ble_Disconnected.")
     lblConnectOrDisconnect.Text = "BLE Disconnected"
+	lblConnectOrDisconnect.SetColorAndBorder (xui.Color_Red, 1dip, xui.Color_Black, 20dip)
     ToastMessageShow("Disconnected.", True)
 End Sub
 
