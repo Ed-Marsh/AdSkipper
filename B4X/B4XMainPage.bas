@@ -64,13 +64,23 @@ Private Sub RequestBlePermissions
         Permissions = Array(rp.PERMISSION_ACCESS_FINE_LOCATION)
     End If
     For Each perm As String In Permissions
-        Log(TAG & " Requesting permission: " & perm)
-        rp.CheckAndRequest(perm)
-        Wait For B4XPage_PermissionResult (Permission As String, Result As Boolean)
-        Log(TAG & " Permission result: " & Permission & " = " & Result)
-        If Result = False Then
-            ToastMessageShow("Permission denied: " & Permission, True)
-            Return
+        Log(TAG & " Checking permission: " & perm)
+        If rp.Check(perm) Then
+            Log(TAG & " Already granted: " & perm)
+        Else
+            rp.CheckAndRequest(perm)
+            Wait For B4XPage_PermissionResult (Permission As String, Result As Boolean)
+            Log(TAG & " Permission result: " & Permission & " = " & Result)
+            If Result = False Then
+                ' May be permanently denied — send user to App Settings to grant manually.
+                Log(TAG & " Permission denied: " & perm & " — opening App Settings.")
+                ToastMessageShow("Please grant Location in App Settings then try again.", True)
+                Dim Intent1 As Intent
+                Intent1.Initialize("android.settings.APPLICATION_DETAILS_SETTINGS", "")
+                Intent1.Data = "package:" & Application.PackageName
+                StartActivity(Intent1)
+                Return
+            End If
         End If
     Next
     Log(TAG & " All permissions granted — starting scan.")
