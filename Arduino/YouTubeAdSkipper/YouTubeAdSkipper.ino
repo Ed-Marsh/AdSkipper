@@ -8,6 +8,16 @@
  *    click — mapping to screen targets regardless of prior cursor position.
  *
  * Board target : ESP32-S3 DevKitC-1 (esp32s3) in the Arduino IDE / PlatformIO.
+ *
+ * Required Arduino IDE board settings (Tools menu):
+ *   Flash Mode        : QIO 80MHz   (NOT OPI — board does not have Octal flash)
+ *   Flash Size        : 16MB (128Mb)
+ *   Partition Scheme  : 16M Flash (3MB APP/9.9MB FATFS)
+ *   PSRAM             : Disabled
+ *   USB Mode          : USB-OTG (TinyUSB)
+ *   USB CDC On Boot   : Disabled
+ *   Upload Mode       : UART0 / Hardware CDC
+ *
  * Required libraries:
  *   - ESP32 Arduino core ≥ 2.0.11  (includes USB.h, USBHIDMouse.h, BLE*)
  *
